@@ -1,20 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Budget Visualizer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Visualizer - Track Your Expenses</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <div class="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Budget Visualizer</h1>
+                <div class="header-controls">
+                    <button id="darkModeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+                        <span class="icon">🌙</span>
+                    </button>
+                    <button id="exportBtn" class="btn btn-secondary" title="Export data as CSV">
+                        <span>📥 Export</span>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    <div class="container">
-        <h1>💰 Budget Visualizer</h1>
+        <main class="app-main">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="input-card">
+                    <h2>Add Transaction</h2>
+                    <form id="expenseForm">
+                        <div class="form-group">
+                            <label for="incomeInput">Income (₹)</label>
+                            <input 
+                                type="number" 
+                                id="incomeInput" 
+                                placeholder="Enter your income" 
+                                min="0" 
+                                step="0.01"
+                            >
+                        </div>
 
-        <input type="number" id="income" placeholder="Enter Income">
-        <input type="number" id="expense" placeholder="Enter Expense">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="categorySelect">Category</label>
+                                <select id="categorySelect">
+                                    <option value="">Select Category</option>
+                                    <option value="Food">Food & Dining</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Entertainment">Entertainment</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Health">Health & Fitness</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
 
-        <button onclick="calculate()">Calculate</button>
+                            <div class="form-group">
+                                <label for="expenseInput">Amount (₹)</label>
+                                <input 
+                                    type="number" 
+                                    id="expenseInput" 
+                                    placeholder="Enter amount" 
+                                    min="0" 
+                                    step="0.01"
+                                >
+                            </div>
+                        </div>
 
-        <h2 id="result"></h2>
+                        <div class="form-group">
+                            <label for="descriptionInput">Description</label>
+                            <input 
+                                type="text" 
+                                id="descriptionInput" 
+                                placeholder="e.g., Lunch at cafe" 
+                            >
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Add Expense</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-label">Total Income</div>
+                    <div class="stat-value">₹<span id="totalIncome">0</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value danger">₹<span id="totalExpenses">0</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Remaining Balance</div>
+                    <div class="stat-value success">₹<span id="balance">0</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Savings Rate</div>
+                    <div class="stat-value accent"><span id="savingsRate">0</span>%</div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="chart-card">
+                    <h3>Spending by Category</h3>
+                    <canvas id="categoryPieChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Monthly Trend</h3>
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Budget Goals Section -->
+            <section class="goals-section">
+                <h2>Budget Goals</h2>
+                <div class="goals-container">
+                    <div class="goal-input">
+                        <select id="goalCategory">
+                            <option value="">Select Category</option>
+                            <option value="Food">Food & Dining</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Health">Health & Fitness</option>
+                        </select>
+                        <input 
+                            type="number" 
+                            id="goalAmount" 
+                            placeholder="Budget limit (₹)" 
+                            min="0" 
+                            step="0.01"
+                        >
+                        <button id="setGoalBtn" class="btn btn-secondary">Set Goal</button>
+                    </div>
+                    <div id="goalsDisplay" class="goals-display"></div>
+                </div>
+            </section>
+
+            <!-- Transaction History Section -->
+            <section class="history-section">
+                <div class="history-header">
+                    <h2>Transaction History</h2>
+                    <button id="clearHistoryBtn" class="btn btn-danger" title="Clear all transactions">Clear All</button>
+                </div>
+                <div class="filter-controls">
+                    <select id="filterCategory">
+                        <option value="">All Categories</option>
+                        <option value="Food">Food & Dining</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Health">Health & Fitness</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div id="transactionsList" class="transactions-list">
+                    <p class="empty-state">No transactions yet. Add your first expense!</p>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script src="script.js"></script>
